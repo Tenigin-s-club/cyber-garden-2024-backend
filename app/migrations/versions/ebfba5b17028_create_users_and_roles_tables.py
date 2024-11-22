@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column('fio', sa.String(), nullable=False),
         sa.Column('email', sa.String(), nullable=False),
         sa.Column('position', sa.String(), nullable=False),
-        sa.Column('role', sa.Integer(), nullable=False),
+        sa.Column('role_id', sa.Integer(), nullable=False),
         sa.Column('password', sa.String(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('fio')
@@ -57,7 +57,7 @@ def upgrade() -> None:
             'fio': settings.ADMIN_FIO,
             'email': settings.ADMIN_EMAIL,
             'position': 'admin',
-            'role': 0,
+            'role_id': 0,
             'password': get_password_hash(settings.ADMIN_PASSWORD)
         }]
     )
