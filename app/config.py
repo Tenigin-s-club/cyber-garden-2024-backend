@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import EmailStr
 
 
 class Settings(BaseSettings):
@@ -15,6 +16,11 @@ class Settings(BaseSettings):
     # JWT settings
     SECRET_KEY: str
     ENCODE_ALGORITHM: str
+
+    # Admin credentials
+    ADMIN_FIO: str
+    ADMIN_EMAIL: EmailStr
+    ADMIN_PASSWORD: str
 
     @property
     def POSTGRES_URL(self):
