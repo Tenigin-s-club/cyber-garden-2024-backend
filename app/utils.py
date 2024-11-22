@@ -3,13 +3,14 @@ from typing import Literal, Annotated
 from uuid import UUID
 
 from fastapi import Response, Cookie
-from jose import jwt, JWTError
+import jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 
 from app.config import settings
 from app.exceptions import (UserInvalidCredentialsException,
-                            UserNameAlreadyTakenException, InvalidTokenException, UserNotAuthenticatedException)
+                            UserNameAlreadyTakenException, InvalidTokenException, UserNotAuthenticatedException,
+                            UserEmailAlreadyTakenException)
 from app.repositories.users import UsersRepository
 from app.schemas.users import SUser
 
@@ -33,9 +34,10 @@ def get_user_id_from_token(token: str) -> UUID:
 
 
 async def check_fio_or_email_exists(fio: str, email: EmailStr) -> None:
-    if await UsersRepository.find_one_or_none(fio=fio)\
-            or await UsersRepository.find_one_or_none(email=email):
+    if await UsersRepository.find_one_or_none(fio=fio):
         raise UserNameAlreadyTakenException
+    if await UsersRepository.find_one_or_none(email=email):
+        raise UserEmailAlreadyTakenException
 
 
 def create_token(token_type: Literal['access', 'refresh'], payload: dict) -> str:
@@ -74,7 +76,7 @@ def check_token(token: str) -> None:
         raise UserNotAuthenticatedException
     try:
         jwt.decode(token, settings.SECRET_KEY, settings.ENCODE_ALGORITHM)
-    except JWTError:
+    except jwt.exceptions.DecodeError:
         raise InvalidTokenException
 
 
