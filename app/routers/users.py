@@ -1,9 +1,14 @@
+from uuid import UUID
+
+from asyncpg import connect
 from fastapi import APIRouter, Depends, Response, status
+
+from app.config import settings
 from app.repositories.users import UsersRepository
-from app.schemas.users import SInfoUser, SLoginUser, SRegisterUser
+from app.schemas.users import SLoginUser, SRegisterUser
 from app.utils import (authenticate_user, check_fio_or_email_exists,
-                       create_tokens_cookie, get_password_hash,
-                       get_user_id_from_token, get_refresh_token, get_access_token)
+                       create_token, get_password_hash,
+                       get_user_id_and_role_from_token, get_admin_token)
 
 router = APIRouter(
     prefix='/auth',
@@ -11,61 +16,50 @@ router = APIRouter(
 )
 
 
-@router.post('/register', status_code=status.HTTP_204_NO_CONTENT)
-async def register_user(response: Response, user: SRegisterUser):
-    await check_fio_or_email_exists(user.fio, user.email)
-    new_user_id = await UsersRepository.create(
-        fio=user.fio,
-        email=user.email,
-        position=user.position,
-        role=user.role,
-        password=get_password_hash(user.password)
-    )
-    create_tokens_cookie(response, new_user_id)
-
-
-@router.post('/login', status_code=status.HTTP_204_NO_CONTENT)
+@router.post('/login', status_code=status.HTTP_200_OK)
 async def login_user(response: Response, user: SLoginUser):
     user = await authenticate_user(user.email, user.password)
-    create_tokens_cookie(response, user.id)
+    return {'token': create_token(user.id, user.role_id)}
 
 
-@router.get('/refresh_token', status_code=status.HTTP_204_NO_CONTENT)
-def refresh_user_tokens(response: Response, refresh_token: str = Depends(get_refresh_token)):
-    user_id = get_user_id_from_token(refresh_token)
-    create_tokens_cookie(response, user_id)
+@router.get('/roles', status_code=status.HTTP_200_OK)
+async def get_all_roles():
+    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    return {
+        'roles': [dict(role)["name"] for role in await conn.fetch('SELECT * FROM roles')]
+    }
 
 
-@router.get('/logout', status_code=status.HTTP_204_NO_CONTENT)
-def logout_user(response: Response, refresh_token: str = Depends(get_refresh_token)):
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
+@router.post('/employee', status_code=status.HTTP_201_CREATED)
+async def add_employee(employee: SRegisterUser, access_token: str = Depends(get_admin_token)):
+    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    role = await conn.fetch(f"SELECT * FROM roles WHERE name='{employee.role}'")
+    await check_fio_or_email_exists(employee.fio, employee.email)
+    new_user_id = await UsersRepository.create(
+        fio=employee.fio,
+        email=employee.email,
+        position=employee.position,
+        role_id=dict(role[0])["id"],
+        password=get_password_hash(employee.password)
+    )
+    return {'id': new_user_id}
 
 
-@router.get('/me', status_code=status.HTTP_200_OK)
-async def get_user_data(access_token: str = Depends(get_access_token)):
-    user_id = get_user_id_from_token(access_token)
-    user = await UsersRepository.find_one_or_none(id=user_id)
-    return SInfoUser(**user.model_dump())
-
-
-@router.put('/edit', status_code=status.HTTP_200_OK)
-async def edit_user(user: SRegisterUser, access_token: str = Depends(get_access_token)):
-    user_id = get_user_id_from_token(access_token)
-    await check_fio_or_email_exists(user.fio, user.email)
-    return await UsersRepository.update(
-        id=user_id,
-        fio=user.fio,
-        email=user.email,
-        position=user.position,
-        role=user.role,
-        password=get_password_hash(user.password)
+@router.put('/employee/{employee_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def edit_user(employee_id: UUID, employee: SRegisterUser, access_token: str = Depends(get_admin_token)):
+    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    role = await conn.fetch(f'SELECT * FROM roles WHERE name={employee.role_id}')
+    await check_fio_or_email_exists(employee.fio, employee.email)
+    await UsersRepository.update(
+        id=employee_id,
+        fio=employee.fio,
+        email=employee.email,
+        position=employee.position,
+        role_id=dict(role[0])["id"],
+        password=get_password_hash(employee.password)
     )
 
 
-@router.delete('/delete', status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(response: Response, access_token: str = Depends(get_access_token)):
-    user_id = get_user_id_from_token(access_token)
-    await UsersRepository.delete(id=user_id)
-    response.delete_cookie('access_token')
-    response.delete_cookie('refresh_token')
+@router.delete('/employee/{employee_id}', status_code=status.HTTP_204_NO_CONTENT)
+async def delete_user(employee_id: UUID, access_token: str = Depends(get_admin_token)):
+    await UsersRepository.delete(id=employee_id)

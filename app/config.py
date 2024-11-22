@@ -27,6 +27,11 @@ class Settings(BaseSettings):
         return (f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
                 f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
 
+    @property
+    def POSTGRES_ASYNCPG_URL(self):
+        return (f'postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
+                f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
+
     model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
 
 

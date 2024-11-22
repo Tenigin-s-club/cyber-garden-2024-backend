@@ -19,7 +19,7 @@ class SRegisterUser(BaseModel):
     fio: str
     email: EmailStr
     position: str
-    role_id: int
+    role: str
     password: str
 
 

@@ -32,3 +32,8 @@ class UserNotAuthenticatedException(BaseException):
 class InvalidTokenException(BaseException):
     status_code = status.HTTP_401_UNAUTHORIZED
     detail = 'token expired or has invalid signature/format'
+
+
+class DontHavePermissionException(BaseException):
+    status_code = status.HTTP_403_FORBIDDEN
+    detail = 'you do not have permission to perform this operation'

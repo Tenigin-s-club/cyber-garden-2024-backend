@@ -1,5 +1,5 @@
 from uuid import UUID, uuid4
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 
 from app.db.base import Base
@@ -13,4 +13,5 @@ class User(Base):
     email: Mapped[str]
     position: Mapped[str]
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
+    role: Mapped["Role"] = relationship()
     password: Mapped[str]

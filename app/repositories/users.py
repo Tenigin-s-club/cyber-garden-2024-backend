@@ -30,13 +30,11 @@ class UsersRepository(AbstractRepository):
             return result.scalar()
 
     @staticmethod
-    async def update(id, **values) -> SInfoUser:
+    async def update(id, **values) -> None:
         async with async_session_maker() as session:
             query = update(User).filter_by(id=id).values(**values).returning(User.__table__.columns)
-            result = await session.execute(query)
+            await session.execute(query)
             await session.commit()
-            mapping_result = result.mappings().one_or_none()
-            return SInfoUser(**mapping_result) if mapping_result else None
 
     @staticmethod
     async def delete(**filter_by) -> None:
