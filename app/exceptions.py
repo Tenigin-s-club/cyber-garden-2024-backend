@@ -1,23 +1,34 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from fastapi import HTTPException, status
 
 
-class Settings(BaseSettings):
-    # PostgreSQL settings
-    POSTGRES_HOST: str
-    POSTGRES_PORT: int
-    POSTGRES_DB: str
-    POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+class BaseException(HTTPException):
+    status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    detail = ''
 
-    # FastAPI settings
-    FASTAPI_PORT: int
-
-    @property
-    def POSTGRES_URL(self):
-        return (f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
-                f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
-
-    model_config = SettingsConfigDict(env_file='.env', env_file_encoding='utf-8')
+    def __init__(self):
+        super().__init__(status_code=self.status_code, detail=self.detail)
 
 
-settings = Settings()
+class UserNameAlreadyTakenException(BaseException):
+    status_code = status.HTTP_409_CONFLICT
+    detail = 'this user name is already taken'
+
+
+class UserEmailAlreadyTakenException(BaseException):
+    status_code = status.HTTP_409_CONFLICT
+    detail = 'this email address is already taken'
+
+
+class UserInvalidCredentialsException(BaseException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'invalid email or password'
+
+
+class UserNotAuthenticatedException(BaseException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'you are not logged in your account'
+
+
+class InvalidTokenException(BaseException):
+    status_code = status.HTTP_401_UNAUTHORIZED
+    detail = 'token expired or has invalid signature/format'
