@@ -63,19 +63,14 @@ async def get_map(
     }
 ]
    
-   
-@router.get("/search")
-async def get_search_employee(
-    type: Literal["employee", "inventory"], 
-    fio: str | None = None,
-    inventory_id: int | None = None
-):
+ 
+@router.get("/inventory/{office_id}")  
+async def get_inventory_in_office(office_id: int):
     return [
     {
-        "id": "790a838d-b21f-43d1-88f6-aac6da213ae5",
-        "fio": "Piradasov Huesos Eblanovich",
-        "office": 15,
-        "floor": 17
+        "id": 1,
+        "name": "govno-mac",
+        "fio": "Piradasov Huesos Eblanovich"
     }
 ]
     
