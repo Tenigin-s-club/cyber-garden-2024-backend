@@ -3,7 +3,7 @@ from typing import Literal, Annotated
 from uuid import UUID
 
 from fastapi import Response, Cookie
-from jose import jwt, JWTError
+import jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
 
@@ -74,7 +74,7 @@ def check_token(token: str) -> None:
         raise UserNotAuthenticatedException
     try:
         jwt.decode(token, settings.SECRET_KEY, settings.ENCODE_ALGORITHM)
-    except JWTError:
+    except jwt.exceptions.DecodeError:
         raise InvalidTokenException
 
 
