@@ -1,4 +1,4 @@
-"""create users table
+"""create users and roles tables
 
 Revision ID: ebfba5b17028
 Revises: 
@@ -31,6 +31,24 @@ def upgrade() -> None:
         sa.Column('password', sa.String(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('fio')
+    )
+    roles_table = op.create_table('roles',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('name')
+    )
+    op.bulk_insert(
+        roles_table,
+        [{
+                'id': 0,
+                'name': 'admin',
+            },
+            {
+                'id': 1,
+                'name': 'user'
+            }
+        ]
     )
     op.bulk_insert(
         users_table,

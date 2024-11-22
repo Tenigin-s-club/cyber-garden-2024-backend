@@ -1,4 +1,4 @@
-"""empty message
+"""create office tables
 
 Revision ID: 2b83d3332ba3
 Revises: ebfba5b17028
@@ -41,12 +41,6 @@ def upgrade() -> None:
     sa.Column('image', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('address'),
-    sa.UniqueConstraint('name')
-    )
-    op.create_table('roles',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(), nullable=False),
-    sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
     op.create_table('floors',
