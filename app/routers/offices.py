@@ -15,16 +15,19 @@ async def get_offices():
     {
         "id": 1,
         "name": "WTF Office",
+        "image":"https://avatars.mds.yandex.net/i?id=9ee22a3bc34f30f8d805534ea8f03275_l-6598906-images-thumbs&n=13",
         "address": "sosay kudasay"
     },
     {
         "id": 3,
         "name": "WTF Office",
+        "image":"https://avatars.mds.yandex.net/i?id=9ee22a3bc34f30f8d805534ea8f03275_l-6598906-images-thumbs&n=13",
         "address": "sosay kudasay 2"
     },
     {
         "id": 2,
         "name": "WTF Off",
+        "image":"https://avatars.mds.yandex.net/i?id=9ee22a3bc34f30f8d805534ea8f03275_l-6598906-images-thumbs&n=13",
         "address": "sosay kudasay 3"
     }
 ]
