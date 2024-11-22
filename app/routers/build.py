@@ -15,6 +15,14 @@ async def get_inventory():
     {
         "id": 1,
         "name": "govno-mac",
+    },
+    {
+        "id": 1,
+        "name": "govno-mac",
+    },
+    {
+        "id": 1,
+        "name": "govno-mac",
     }
 ]
     
@@ -23,6 +31,14 @@ async def get_inventory():
 async def get_furniture():
     return [
     {
+        "id": 1,
+        "name": "stol",
+    },
+        {
+        "id": 1,
+        "name": "stol",
+    },
+        {
         "id": 1,
         "name": "stol",
     }

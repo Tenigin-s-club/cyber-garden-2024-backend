@@ -16,6 +16,16 @@ async def get_offices():
         "id": 1,
         "name": "WTF Office",
         "address": "sosay kudasay"
+    },
+    {
+        "id": 3,
+        "name": "WTF Office",
+        "address": "sosay kudasay 2"
+    },
+    {
+        "id": 2,
+        "name": "WTF Off",
+        "address": "sosay kudasay 3"
     }
 ]
     
@@ -26,6 +36,14 @@ async def get_floors(office_id: int):
     {
         "id": 5,
         "name": "Conchenoy"
+    },
+    {
+        "id": 7,
+        "name": "Conchenoy v rot"
+    },
+    {
+        "id": 10,
+        "name": "Conchenoy v shopa"
     }
 ]
     
@@ -43,7 +61,58 @@ async def get_employees(office_id):
         "inventory": [{
             "id": 1,
             "name": "palka ebalka"
-        }]
+        },
+                      {
+            "id": 8,
+            "name": "palka ebalka v1"
+        },
+                      {
+            "id": 7,
+            "name": "palka ebalka 2.0"
+        }
+                      ]
+    },
+        {
+        "id": "790a838d-b21f-43d1-88f6-aac6da213ae5",
+        "fio": "Koras Korsr Elizovetovich",
+        "position": "huesos developer 2.0",
+        "place": 19,
+        "email":"huesos@mail.ru",
+        # то, что на столе
+        "inventory": [{
+            "id": 1,
+            "name": "palka ebalka no ne eblaka 1"
+        },
+                      {
+            "id": 8,
+            "name": "palka ebalka no ne eblaka 2"
+        },
+                      {
+            "id": 7,
+            "name": "palka ebalka no ne eblaka 3"
+        }
+                      ]
+    },
+        {
+        "id": "790a838d-b21f-43d1-88f6-aac6da213ae5",
+        "fio": "Koras Korsr Huyglotanovich",
+        "position": "huesos developer 2.0",
+        "place": 20,
+        "email":"huesos@mail.ru",
+        # то, что на столе
+        "inventory": [{
+            "id": 5,
+            "name": "palka ebalka no ne eblaka no ebalka 1"
+        },
+                      {
+            "id": 2,
+            "name": "palka ebalka no ne eblaka no ebalka 2"
+        },
+                      {
+            "id": 77,
+            "name": "palka ebalka no ne eblaka no ebalka  3"
+        }
+                      ]
     }
 ]
     
@@ -60,6 +129,20 @@ async def get_map(
         "x": 17,
         "y": 21,
         "is_vertical": True
+    },
+    {
+            "id": 89,
+        "type": 12,
+        "x": 27,
+        "y": 31,
+        "is_vertical": False
+    },
+        {
+        "id": 189,
+        "type": 212,
+        "x": 237,
+        "y": 331,
+        "is_vertical": False
     }
 ]
    
@@ -68,6 +151,11 @@ async def get_map(
 async def get_inventory_in_office(office_id: int):
     return [
     {
+        "id": 1,
+        "name": "govno-mac",
+        "fio": "Piradasov Huesos Eblanovich"
+    },
+        {
         "id": 1,
         "name": "govno-mac",
         "fio": "Piradasov Huesos Eblanovich"
