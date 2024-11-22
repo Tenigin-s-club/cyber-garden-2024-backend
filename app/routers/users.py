@@ -6,7 +6,7 @@ from app.utils import (authenticate_user, check_fio_or_email_exists,
                        get_user_id_from_token, get_refresh_token, get_access_token)
 
 router = APIRouter(
-    prefix='/users',
+    prefix='/auth',
     tags=['auth']
 )
 
