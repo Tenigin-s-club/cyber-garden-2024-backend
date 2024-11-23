@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
 from uuid import UUID
+import json
 
 from app.schemas.build import SInventoryType
 
