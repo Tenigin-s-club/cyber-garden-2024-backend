@@ -38,8 +38,8 @@ class SOfficeEmployee(BaseModel):
     inventory: list[SInventoryType]
     
     @model_validator(mode="before")
-    @classmethod
-    def validate_to_lost(cls, value):
+    @staticmethod
+    def validate_to_lost(value):
         if isinstance(value["inventory"], str):
             value["inventory"] = json.loads(value["inventory"])
         return value
