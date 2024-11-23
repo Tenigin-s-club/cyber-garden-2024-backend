@@ -35,7 +35,7 @@ class SMap(BaseModel):
     
 class SFurnitureEmployee(BaseModel):
     furniture_id: int
-    employee_id: int
+    employee_id: str
 
 
 class SFurnitureID(BaseModel):
@@ -44,7 +44,7 @@ class SFurnitureID(BaseModel):
 
 class SInventoryEmployee(BaseModel):
     inventory_id: int
-    employee_id: int
+    employee_id: str
 
 
 class SInventoryID(BaseModel):

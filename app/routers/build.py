@@ -74,7 +74,7 @@ async def update_floor(
 async def attach_employee_furniture(furniture_employee: SFurnitureEmployee):
     await FurnitureEmployeeRepository.create(
         user_id=furniture_employee.employee_id,
-        furniture_id=furniture_employee.place_id,
+        furniture_id=furniture_employee.furniture_id,
     )
 
 
