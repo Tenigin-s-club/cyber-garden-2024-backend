@@ -19,7 +19,7 @@ class SRegisterUser(BaseModel):
     fio: str
     email: EmailStr
     position: str
-    role: str
+    role: str | None = "user"
     password: str
     office_id: int | None = None
     floor_id: int | None = None
