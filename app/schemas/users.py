@@ -21,8 +21,8 @@ class SRegisterUser(BaseModel):
     position: str
     role: str | None = "user"
     password: str
-    office_id: int | None = None
-    floor_id: int | None = None
+    office_id: int
+    floor_id: int
 
 
 class SUser(BaseModel):

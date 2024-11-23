@@ -37,17 +37,23 @@ class SMap(BaseModel):
     items: list[SMapPlace]
 
     
-class SFurnitureEmployee(BaseModel):
-    furniture_id: int
+class SFurnitureIDS(BaseModel):
+    furniture_ids: list[int]
+    
+    
+class SFurnitureEmployee(SFurnitureIDS):
     user_id: str
 
 
 class SFurnitureID(BaseModel):
     furniture_id: int
+    
+
+class SInventoryIDS(BaseModel):
+    inventory_ids: list[int]
 
 
-class SInventoryEmployee(BaseModel):
-    inventory_id: int
+class SInventoryEmployee(SInventoryIDS):
     user_id: str
 
 

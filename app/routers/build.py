@@ -4,7 +4,7 @@ from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
     InventoryEmployeeRepository
 from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SFurnitureEmployee, SMapPlace, \
-    SFurnitureID, SInventoryEmployee, SInventoryID
+    SFurnitureID, SInventoryEmployee, SInventoryID, SFurnitureIDS, SInventoryIDS
 
 from asyncpg import connect
 
@@ -71,19 +71,14 @@ async def update_floor(
 
 
 @router.post("/attach/furniture", status_code=status.HTTP_201_CREATED)
-async def attach_employee_furniture(furniture_employee: SFurnitureEmployee):
-    await FurnitureEmployeeRepository.create(
-        user_id=furniture_employee.user_id,
-        furniture_id=furniture_employee.furniture_id,
-    )
-    
+async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> SFurnitureIDS:
+    ids = await FurnitureEmployeeRepository.create_attaches_furniture(furniture_employee)
+    return SFurnitureIDS(furniture_ids=ids)
     
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
 async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
-    await InventoryEmployeeRepository.create(
-        user_id=inventory_employee.user_id,
-        inventory_id=inventory_employee.inventory_id,
-    )
+    ids = await InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
+    return SInventoryIDS(inventory_ids=ids)
 
 
 @router.delete("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
