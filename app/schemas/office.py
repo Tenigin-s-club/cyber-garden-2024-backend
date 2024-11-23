@@ -1,6 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from uuid import UUID
 
+from app.schemas.build import SInventoryType
+
 
 class SOfficeCreate(BaseModel):
     name: str
@@ -19,3 +21,17 @@ class SOffice(SOfficeCreate):
     
 class SFloor(SFloorCreate):
     id: int
+
+
+class SOfficeInventory(BaseModel):
+    id: int
+    name: str
+    fio: str
+
+
+class SOfficeEmployee(BaseModel):
+    id: int
+    fio: str
+    position: str
+    email: EmailStr
+    inventory: list[SInventoryType]

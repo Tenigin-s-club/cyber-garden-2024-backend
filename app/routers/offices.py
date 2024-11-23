@@ -3,7 +3,7 @@ from fastapi import APIRouter, status
 from app.config import settings
 from app.repositories.users import UsersRepository
 from app.schemas.build import SMap, SMapPlace, SInventoryType
-from app.schemas.office import SOfficeCreate, SFloorCreate
+from app.schemas.office import SOfficeCreate, SFloorCreate, SOfficeInventory, SOfficeEmployee
 from app.repositories.offices import OfficesRepository, FloorsRepository
 
 from asyncpg import connect
@@ -28,17 +28,34 @@ async def get_office_floors(office_id: int):
 async def get_office_inventory(office_id: int):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
     result = await conn.fetch(f"""
-            SELECT user_inventory.id, inventory.name, users.fio FROM users
-            WHERE office_id='{office_id}'
-            JOIN user_inventory ON user_inventory.user_id = users.id
-            JOIN inventory ON user_inventory.inventory_id = inventory.id
-        """)
-    return [SInventoryType(**elem) for elem in result]
+        SELECT user_inventory.id, inventory.name, users.fio FROM users
+        JOIN user_inventory ON user_inventory.user_id = users.id
+        JOIN inventory ON user_inventory.inventory_id = inventory.id
+        WHERE office_id='{office_id}'
+    """)
+    return [SOfficeInventory(**elem) for elem in result]
     
 
 @router.get('/employees/{office_id}')
 async def get_office_employees(office_id):
-    return await UsersRepository.find_all(office_id=office_id)
+    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    result = await conn.fetch(f"""
+        SELECT
+            users.id,
+            users.fio,
+            users.position,
+            users.email,
+            coalesce(json_agg(json_build_object(
+                'id', inventory.id, 'name', inventory.name,
+                )) filter (where inventory.id is not null), '[]'
+            ) as inventory
+        FROM users
+        JOIN user_inventory ON user_inventory.user_id = users.id
+        JOIN inventory ON user_inventory.inventory_id = inventory.id
+        WHERE office_id='{office_id}'
+        GROUP BY users.id
+    """)
+    return [SOfficeEmployee(**elem) for elem in result]
 
 
 @router.get('/employees/{employee_id}/inventory')
@@ -46,8 +63,8 @@ async def get_employee_inventory(employee_id: int):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
     result = await conn.fetch(f"""
         SELECT inventory.id, inventory.name FROM user_inventory
-        WHERE user_id='{employee_id}'
         JOIN inventory ON inventory.id = user_inventory.inventory_id
+        WHERE user_id='{employee_id}'
     """)
     return [SInventoryType(**elem) for elem in result]
     
