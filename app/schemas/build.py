@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+
 
 
 class SInventoryType(BaseModel):
     id: int
     name: str
-
+    
 
 class SFurnitureType(BaseModel):
     id: int

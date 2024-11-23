@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, model_validator
 from uuid import UUID
+import json
 
 from app.schemas.build import SInventoryType
 
@@ -30,8 +31,15 @@ class SOfficeInventory(BaseModel):
 
 
 class SOfficeEmployee(BaseModel):
-    id: int
+    id: UUID
     fio: str
     position: str
     email: EmailStr
     inventory: list[SInventoryType]
+    
+    @model_validator(mode="before")
+    @classmethod
+    def validate_to_lost(cls, value):
+        if isinstance(value["inventory"], str):
+            value["inventory"] = json.loads(value["inventory"])
+        return value

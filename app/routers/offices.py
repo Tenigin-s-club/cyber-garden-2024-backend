@@ -57,8 +57,7 @@ async def get_office_employees(office_id):
         WHERE office_id='{office_id}'
         GROUP BY users.id
     """)
-    # return [SOfficeEmployee(**elem) for elem in result]
-    return result
+    return [SOfficeEmployee(**elem) for elem in result]
 
 
 @router.get('/employees/{employee_id}/inventory')
