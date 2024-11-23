@@ -9,4 +9,4 @@ class UserInventory(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    inventory_id: Mapped[int] = mapped_column(ForeignKey("inventory.id", ondelete="CASCADE"))
+    inventory_id: Mapped[int] = mapped_column(ForeignKey("inventory.id", ondelete="CASCADE"), unique=True)

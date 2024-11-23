@@ -1,4 +1,5 @@
 from pydantic import BaseModel, model_validator
+from typing import Optional
 
 
 
@@ -16,6 +17,7 @@ class SFurnitureType(BaseModel):
 
 class SInventoryTypeCreate(BaseModel):
     name: str
+    office_id: int
 
 
 class SFurnitureTypeCreate(BaseModel):
@@ -25,8 +27,8 @@ class SFurnitureTypeCreate(BaseModel):
     
     
 class SMapPlace(BaseModel):
-    id: int
-    type: int
+    id: int | None = None
+    furniture_id: int
     x: int
     y: int
     is_vertical: bool
@@ -36,19 +38,31 @@ class SMap(BaseModel):
     items: list[SMapPlace]
 
     
-class SFurnitureEmployee(BaseModel):
-    furniture_id: int
+class SFurnitureIDS(BaseModel):
+    furniture_ids: list[int]
+    
+    
+class SFurnitureEmployee(SFurnitureIDS):
     user_id: str
 
 
 class SFurnitureID(BaseModel):
     furniture_id: int
+    
+
+class SInventoryIDS(BaseModel):
+    inventory_ids: list[int]
 
 
-class SInventoryEmployee(BaseModel):
-    inventory_id: int
+class SInventoryEmployee(SInventoryIDS):
     user_id: str
 
 
 class SInventoryID(BaseModel):
     inventory_id: int
+    
+    
+class SInventoryEmployeeOffice(BaseModel):
+    id: int
+    fio: str | None = None
+    name: str

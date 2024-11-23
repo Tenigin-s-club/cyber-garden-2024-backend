@@ -7,3 +7,4 @@ from .map import Map
 from .roles import Role
 from .user_furniture import UserFurniture
 from .user_inventory import UserInventory
+from .whorehouse import WhoreHouse

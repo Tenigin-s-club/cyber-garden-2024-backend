@@ -1,6 +1,7 @@
 import json
 
 from fastapi import APIRouter, status, Depends
+from asyncpg import connect
 
 from app.config import settings
 from app.schemas.build import SMap, SMapPlace, SInventoryType
@@ -60,8 +61,8 @@ async def get_office_employees(office_id):
                 )) filter (where inventory.id is not null), '[]'
             ) as inventory
         FROM users
-        JOIN user_inventory ON user_inventory.user_id = users.id
-        JOIN inventory ON user_inventory.inventory_id = inventory.id
+        LEFT JOIN user_inventory ON user_inventory.user_id = users.id
+        LEFT JOIN inventory ON user_inventory.inventory_id = inventory.id
         WHERE office_id='{office_id}'
         GROUP BY users.id
     """)
@@ -69,7 +70,7 @@ async def get_office_employees(office_id):
 
 
 @router.get('/employees/{employee_id}/inventory')
-async def get_employee_inventory(employee_id: int):
+async def get_employee_inventory(employee_id: str):
     conn = await connect(settings.POSTGRES_CLEAR_URL)
     result = await conn.fetch(f"""
         SELECT inventory.id, inventory.name FROM user_inventory
