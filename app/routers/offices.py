@@ -58,8 +58,8 @@ async def get_office_employees(office_id):
                 )) filter (where inventory.id is not null), '[]'
             ) as inventory
         FROM users
-        JOIN user_inventory ON user_inventory.user_id = users.id
-        JOIN inventory ON user_inventory.inventory_id = inventory.id
+        LEFT JOIN user_inventory ON user_inventory.user_id = users.id
+        LEFT JOIN inventory ON user_inventory.inventory_id = inventory.id
         WHERE office_id='{office_id}'
         GROUP BY users.id
     """)
