@@ -172,7 +172,7 @@ async def get_inventory_in_office(office_id: int):
 ]
     
     
-@router.get("/offices/employees/{employee_id}/inventory")
+@router.get("/employees/{employee_id}/inventory")
 async def get_inventory_employees(employee_id: int):
     return [
         {
