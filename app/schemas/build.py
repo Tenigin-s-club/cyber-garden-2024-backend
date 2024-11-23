@@ -60,3 +60,9 @@ class SInventoryEmployee(SInventoryIDS):
 
 class SInventoryID(BaseModel):
     inventory_id: int
+    
+    
+class SInventoryEmployeeOffice(BaseModel):
+    id: int
+    fio: str | None = None
+    name: str

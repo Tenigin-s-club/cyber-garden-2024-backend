@@ -1,9 +1,10 @@
-from sqlalchemy import insert
+from sqlalchemy import insert, select, or_
 
-from app.db.models import InventoryTypes, FurnitureTypes, UserFurniture, UserInventory, WhoreHouse
+from app.db.models import InventoryTypes, FurnitureTypes, UserFurniture, UserInventory, WhoreHouse, User
 from app.db.base import async_session_maker
 from app.repositories.base import BaseRepository
-from app.schemas.build import SInventoryType, SFurnitureType, SFurnitureEmployee, SInventoryEmployee, SInventoryID, SInventoryTypeCreate
+from app.schemas.build import SInventoryType, SFurnitureType, \
+SFurnitureEmployee, SInventoryEmployee, SInventoryID, SInventoryTypeCreate, SInventoryEmployeeOffice
 
 
 class InventoryTypesRepository(BaseRepository):
@@ -26,7 +27,17 @@ class InventoryTypesRepository(BaseRepository):
             await session.commit()
             return inventory_id
         
-
+    @staticmethod
+    async def get_office_inventory(office_id: int):
+        async with async_session_maker() as session:
+            query = (select(InventoryTypes.name, InventoryTypes.id, User.fio).where(or_(User.office_id == office_id, WhoreHouse.office_id == office_id))
+                     .join(UserInventory, UserInventory.inventory_id == InventoryTypes.id, isouter=True)
+                     .join(User, User.id == UserInventory.user_id, isouter=True))
+            inventory = await session.execute(query)
+            inventory = inventory.mappings().all()
+            return [SInventoryEmployeeOffice(**row) for row in inventory]
+            
+            
 
 class FurnitureTypesRepository(BaseRepository):
     model = FurnitureTypes
