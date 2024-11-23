@@ -42,9 +42,9 @@ async def delete_inventory(inventory_id: int) -> None:
     await InventoryTypesRepository.delete(id=inventory_id)
 
 
-@router.delete("/inventory/{furniture_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_inventory(furniture_id: int) -> None:
-    await InventoryTypesRepository.delete(id=furniture_id)
+@router.delete("/furniture/{furniture_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_furniture(furniture_id: int) -> None:
+    await FurnitureTypesRepository.delete(id=furniture_id)
 
 
 @router.put("/edit/{office_id}/{floor_id}", status_code=status.HTTP_200_OK)
