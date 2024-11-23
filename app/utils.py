@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Header
+from fastapi import Header, Request
 import jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
@@ -68,3 +68,8 @@ def check_token(token: str, check_admin: bool = False) -> None:
 def get_admin_token(access_token: Annotated[str | None, Header()] = None):
     check_token(access_token, check_admin=True)
     return access_token
+
+
+def check_endpoint_permissions(request: Request, access_token: Annotated[str | None, Header()] = None):
+    if request.method == 'GET': return
+    check_token(access_token, check_admin=True)

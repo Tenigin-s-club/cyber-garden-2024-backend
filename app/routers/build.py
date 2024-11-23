@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 
 from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
@@ -8,9 +8,12 @@ from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, 
 
 from asyncpg import connect
 
+from app.utils import check_endpoint_permissions
+
 router = APIRouter(
     prefix="/build",
-    tags=["Build"]
+    tags=["Build"],
+    dependencies=[Depends(check_endpoint_permissions)]
 )
 
 

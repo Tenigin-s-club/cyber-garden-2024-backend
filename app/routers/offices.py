@@ -1,16 +1,18 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Depends
 
 from app.config import settings
-from app.repositories.users import UsersRepository
 from app.schemas.build import SMap, SMapPlace, SInventoryType
 from app.schemas.office import SOfficeCreate, SFloorCreate, SOfficeInventory, SOfficeEmployee
 from app.repositories.offices import OfficesRepository, FloorsRepository
 
 from asyncpg import connect
 
+from app.utils import check_endpoint_permissions
+
 router = APIRouter(
     prefix="/offices",
-    tags=["Offices"]
+    tags=["Offices"],
+    dependencies=[Depends(check_endpoint_permissions)]
 )
 
 

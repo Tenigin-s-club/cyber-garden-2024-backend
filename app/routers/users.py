@@ -8,7 +8,7 @@ from app.repositories.users import UsersRepository
 from app.schemas.users import SLoginUser, SRegisterUser
 from app.utils import (authenticate_user, check_fio_or_email_exists,
                        create_token, get_password_hash,
-                       get_user_id_and_role_from_token, get_admin_token)
+                       get_admin_token)
 
 router = APIRouter(
     prefix='/auth',
