@@ -1,14 +1,22 @@
 from pydantic import BaseModel
 
 
-class SCreateInventory(BaseModel):
+class SInventoryType(BaseModel):
+    id: int
     name: str
-    
-    
-class SCreateFurniture(BaseModel):
+
+
+class SFurnitureType(BaseModel):
+    id: int
     name: str
-    size_x: int
-    size_y: int
+
+
+class SInventoryTypeCreate(BaseModel):
+    name: str
+
+
+class SFurnitureTypeCreate(BaseModel):
+    name: str
     
     
 class SMapPlace(BaseModel):
@@ -16,17 +24,26 @@ class SMapPlace(BaseModel):
     type: int
     x: int
     y: int
-    is_vertical: int
+    is_vertical: bool
     
     
 class SMap(BaseModel):
     items: list[SMapPlace]
-    
-    
-class SItem(BaseModel):
-    place_id: int
 
     
-class SEmployeeItem(SItem):
+class SFurnitureEmployee(BaseModel):
+    furniture_id: int
     employee_id: int
-    
+
+
+class SFurnitureID(BaseModel):
+    furniture_id: int
+
+
+class SInventoryEmployee(BaseModel):
+    inventory_id: int
+    employee_id: int
+
+
+class SInventoryID(BaseModel):
+    inventory_id: int

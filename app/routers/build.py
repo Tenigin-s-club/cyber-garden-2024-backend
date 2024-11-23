@@ -1,7 +1,12 @@
 from fastapi import APIRouter, status
 
-from app.schemas.build import SCreateInventory, SCreateFurniture, SMap, SItem, SEmployeeItem
+from app.config import settings
+from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
+    InventoryEmployeeRepository
+from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SItem, SFurnitureEmployee, SMapPlace, \
+    SFurnitureID, SInventoryEmployee, SInventoryID
 
+from asyncpg import connect
 
 router = APIRouter(
     prefix="/build",
@@ -11,98 +16,100 @@ router = APIRouter(
 
 @router.get("/inventory")
 async def get_inventory():
-    return [
-    {
-        "id": 1,
-        "name": "govno-mac",
-    },
-    {
-        "id": 1,
-        "name": "govno-mac",
-    },
-    {
-        "id": 1,
-        "name": "govno-mac",
-    }
-]
+    return await InventoryTypesRepository.find_all()
     
     
 @router.get("/furniture")
 async def get_furniture():
-    return [
-    {
-        "id": 1,
-        "name": "stol",
-    },
-        {
-        "id": 1,
-        "name": "stol",
-    },
-        {
-        "id": 1,
-        "name": "stol",
-    }
-]
+    return await FurnitureTypesRepository.find_all()
     
     
 @router.post("/inventory", status_code=status.HTTP_201_CREATED)
-async def add_inventory(inventory: SCreateInventory):
-    return {
-    "id": 475
-}
+async def add_inventory(inventory: SInventoryTypeCreate):
+    return await InventoryTypesRepository.create(**inventory.model_dump())
     
     
 @router.post("/furniture", status_code=status.HTTP_201_CREATED)
-async def add_furniture(Furniture: SCreateFurniture):
-    return {
-    "id": 777
-}
+async def add_furniture(furniture: SFurnitureTypeCreate):
+    return await FurnitureTypesRepository.create(**furniture.model_dump())
     
-    
+
 @router.delete("/inventory/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_inventory(inventory_id: int) -> None:
-    pass
+    await InventoryTypesRepository.delete(id=inventory_id)
 
 
-@router.put("/edit/{floor_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/inventory/{furniture_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_inventory(furniture_id: int) -> None:
+    await InventoryTypesRepository.delete(id=furniture_id)
+
+
+@router.put("/edit/{office_id}/{floor_id}", status_code=status.HTTP_200_OK)
 async def update_floor(
+    office_id: int,
     floor_id: int,
     map: SMap
-) -> None:
-    pass
+):
+    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    await conn.execute(f"DELETE * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
+    for item in map.items:
+        if not item.id:
+            await conn.execute(f"""
+                INSERT INTO map (office_id, floor_id, furniture_id, x, y, is_vertical)
+                VALUES ({office_id}, {floor_id}, {item.type}, {item.x}, {item.y}, {item.is_vertical});
+            """)
+        else:
+            await conn.execute(f"""
+                INSERT INTO map (id, office_id, floor_id, furniture_id, x, y, is_vertical)
+                VALUES ({item.id}, {office_id}, {floor_id}, {item.type}, {item.x}, {item.y}, {item.is_vertical});
+            """)
+    result = await conn.fetch(f"SELECT * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
+    return SMap(items=[SMapPlace(**item) for item in result])
 
 
 @router.post("/attach/employee", status_code=status.HTTP_201_CREATED)
-async def attach_employee(place_employee: SEmployeeItem):
-    pass
-
-
-@router.put("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_employee_place(
-    employee_id: int,
-    place: SItem
-) -> None:
-    pass
-
-
-@router.delete("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_place_employee(employee_id: int) -> None:
-    pass
+async def attach_employee_furniture(furniture_employee: SFurnitureEmployee):
+    await FurnitureEmployeeRepository.create(
+        user_id=furniture_employee.employee_id,
+        furniture_id=furniture_employee.place_id,
+    )
 
 
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
-async def attache_inventory(item_employee: SEmployeeItem):
-    pass
+async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
+    await InventoryEmployeeRepository.create(
+        user_id=inventory_employee.employee_id,
+        inventory_id=inventory_employee.place_id,
+    )
 
 
-@router.put("/attach/inventory/{employee_id}", status_code=status.HTTP_201_CREATED)
+@router.put("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_employee_furniture(
+    employee_id: int,
+    furniture: SFurnitureID
+):
+    await FurnitureEmployeeRepository.update(
+        id_=employee_id,
+        furniture_id=furniture.furniture_id,
+    )
+
+
+@router.put("/attach/inventory/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_employee_inventory(
     employee_id: int,
-    inventory: SItem
-) -> None:
-    pass
+    inventory: SInventoryID
+):
+    await InventoryEmployeeRepository.update(
+        id_=employee_id,
+        furniture_id=inventory.inventory_id,
+    )
+
+
+@router.delete("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_employee_furniture(employee_id: int) -> None:
+    await FurnitureEmployeeRepository.delete(user_id=employee_id)
 
 
 @router.delete("/attach/inventory/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_inventory(employee_id) -> None:
-    pass
+async def delete_employee_inventory(employee_id: int) -> None:
+    await InventoryEmployeeRepository.delete(user_id=employee_id)

@@ -10,5 +10,7 @@ class Map(Base):
     office_id: Mapped[int] = mapped_column(ForeignKey("offices.id", ondelete="CASCADE"))
     floor_id: Mapped[int] = mapped_column(ForeignKey("floors.id", ondelete="CASCADE"))
     furniture_id: Mapped[int] = mapped_column(ForeignKey("furniture.id", ondelete="CASCADE"))
+    x: Mapped[int]
+    y: Mapped[int]
     is_vertical: Mapped[bool]
     

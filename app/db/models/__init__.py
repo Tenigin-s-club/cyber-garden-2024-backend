@@ -5,4 +5,4 @@ from .furniture import FurnitureTypes
 from .inventory import InventoryTypes
 from .map import Map
 from .roles import Role
-from .user_inventory_furniture import UserInventoryFurniture
+from .user_inventory import UserInventoryFurniture
