@@ -1,4 +1,5 @@
 from fastapi import APIRouter, status, Depends
+from typing import Literal
 
 from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
@@ -18,8 +19,8 @@ router = APIRouter(
 
 
 @router.get("/inventory/{office_id}")
-async def get_inventory(office_id: int, is_free: bool = False):
-    result = await InventoryTypesRepository.get_office_inventory(office_id, is_free)
+async def get_inventory(office_id: int, status: Literal["free", "not_free"] | None = None):
+    result = await InventoryTypesRepository.get_office_inventory(office_id, status)
     return result
     
     

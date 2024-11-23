@@ -28,16 +28,16 @@ class InventoryTypesRepository(BaseRepository):
             return inventory_id
         
     @staticmethod
-    async def get_office_inventory(office_id: int, is_free: bool):
+    async def get_office_inventory(office_id: int, status: str | None = None):
         async with async_session_maker() as session:
             query = (select(InventoryTypes.name, InventoryTypes.id, User.fio)
                      .where(or_(User.office_id == office_id, WhoreHouse.office_id == office_id))
                      .join(UserInventory, UserInventory.inventory_id == InventoryTypes.id, isouter=True)
                      .join(User, User.id == UserInventory.user_id, isouter=True))
             
-            if is_free:
+            if status == "free":
                 query = query.where(User.fio == None)
-            else:
+            if status == "not_free":
                 query = query.where(User.fio != None)
             inventory = await session.execute(query)
             inventory = inventory.unique().mappings().all()
