@@ -53,7 +53,7 @@ async def update_floor(
     floor_id: int,
     map: SMap
 ):
-    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
     await conn.execute(f"DELETE * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     for item in map.items:
         if not item.id:

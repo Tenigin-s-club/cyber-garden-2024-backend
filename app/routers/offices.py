@@ -30,7 +30,7 @@ async def get_office_floors(office_id: int):
 
 @router.get('/inventory/{office_id}', status_code=status.HTTP_200_OK)
 async def get_office_inventory(office_id: int):
-    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
     result = await conn.fetch(f"""
         SELECT user_inventory.id, inventory.name, users.fio FROM users
         JOIN user_inventory ON user_inventory.user_id = users.id
@@ -42,7 +42,7 @@ async def get_office_inventory(office_id: int):
 
 @router.get('/employees/{office_id}')
 async def get_office_employees(office_id):
-    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
     await conn.set_type_codec(
         'json',
         encoder=json.dumps,
@@ -70,7 +70,7 @@ async def get_office_employees(office_id):
 
 @router.get('/employees/{employee_id}/inventory')
 async def get_employee_inventory(employee_id: int):
-    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
     result = await conn.fetch(f"""
         SELECT inventory.id, inventory.name FROM user_inventory
         JOIN inventory ON inventory.id = user_inventory.inventory_id
@@ -81,7 +81,7 @@ async def get_employee_inventory(employee_id: int):
     
 @router.get('/map/{office_id}/{floor_id}')
 async def get_map(office_id: int, floor_id: int):
-    conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
     result = await conn.fetch(f"SELECT * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     return SMap(items=[SMapPlace(**item) for item in result])
     

@@ -28,7 +28,12 @@ class Settings(BaseSettings):
                 f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
 
     @property
-    def POSTGRES_ASYNCPG_URL(self):
+    def POSTGRES_PSYCOPG_URL(self):
+        return (f'postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
+                f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
+
+    @property
+    def POSTGRES_CLEAR_URL(self):
         return (f'postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@'
                 f'{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}')
 

@@ -37,3 +37,13 @@ class InvalidTokenException(BaseException):
 class DontHavePermissionException(BaseException):
     status_code = status.HTTP_403_FORBIDDEN
     detail = 'you do not have permission to perform this operation'
+
+
+class WrongFileExtensionException(BaseException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = 'wrong file extension (pls give me .xlsx)'
+
+
+class IncorrectColumnsSetException(BaseException):
+    status_code = status.HTTP_400_BAD_REQUEST
+    detail = 'incorrect columns set in excel file, need: fio, email, password, position and role'
