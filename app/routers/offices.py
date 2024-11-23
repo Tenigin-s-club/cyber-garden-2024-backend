@@ -1,3 +1,5 @@
+import json
+
 from fastapi import APIRouter, status, Depends
 from asyncpg import connect
 
@@ -39,6 +41,12 @@ async def get_office_inventory(office_id: int):
 @router.get('/employees/{office_id}')
 async def get_office_employees(office_id):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
+    await conn.set_type_codec(
+        'json',
+        encoder=json.dumps,
+        decoder=json.loads,
+        schema='pg_catalog'
+    )
     result = await conn.fetch(f"""
         SELECT
             users.id,

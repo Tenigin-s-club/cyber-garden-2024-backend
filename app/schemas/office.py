@@ -36,10 +36,3 @@ class SOfficeEmployee(BaseModel):
     position: str
     email: EmailStr
     inventory: list[SInventoryType]
-    
-    @model_validator(mode="before")
-    @staticmethod
-    def validate_to_lost(value):
-        if isinstance(value["inventory"], str):
-            value["inventory"] = json.loads(value["inventory"])
-        return value
