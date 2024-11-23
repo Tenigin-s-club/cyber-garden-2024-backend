@@ -9,6 +9,8 @@ class SInventoryType(BaseModel):
 class SFurnitureType(BaseModel):
     id: int
     name: str
+    size_x: int
+    size_y: int
 
 
 class SInventoryTypeCreate(BaseModel):
@@ -44,7 +46,7 @@ class SFurnitureID(BaseModel):
 
 class SInventoryEmployee(BaseModel):
     inventory_id: int
-    employee_id: str
+    user_id: str
 
 
 class SInventoryID(BaseModel):

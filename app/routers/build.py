@@ -70,27 +70,27 @@ async def update_floor(
     return SMap(items=[SMapPlace(**item) for item in result])
 
 
-@router.post("/attach/employee", status_code=status.HTTP_201_CREATED)
+@router.post("/attach/furniture", status_code=status.HTTP_201_CREATED)
 async def attach_employee_furniture(furniture_employee: SFurnitureEmployee):
     await FurnitureEmployeeRepository.create(
         user_id=furniture_employee.user_id,
         furniture_id=furniture_employee.furniture_id,
     )
-
-
+    
+    
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
 async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
     await InventoryEmployeeRepository.create(
-        user_id=inventory_employee.employee_id,
-        inventory_id=inventory_employee.place_id,
+        user_id=inventory_employee.user_id,
+        inventory_id=inventory_employee.inventory_id,
     )
 
 
-@router.put("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/attach/furniture/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_employee_furniture(
-    employee_id: int,
+    employee_id: str,
     furniture: SFurnitureID
-):
+) -> None:
     await FurnitureEmployeeRepository.update(
         id_=employee_id,
         furniture_id=furniture.furniture_id,
@@ -99,9 +99,9 @@ async def update_employee_furniture(
 
 @router.put("/attach/inventory/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_employee_inventory(
-    employee_id: int,
+    employee_id: str,
     inventory: SInventoryID
-):
+) -> None:
     await InventoryEmployeeRepository.update(
         id_=employee_id,
         furniture_id=inventory.inventory_id,

@@ -10,7 +10,7 @@ class User(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     fio: Mapped[str] = mapped_column(unique=True)
-    email: Mapped[str]
+    email: Mapped[str] = mapped_column(unique=True)
     position: Mapped[str]
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
     role: Mapped["Role"] = relationship()

@@ -48,7 +48,7 @@ async def get_office_employees(office_id):
             users.position,
             users.email,
             coalesce(json_agg(json_build_object(
-                'id', inventory.id, 'name', inventory.name,
+                'id', inventory.id, 'name', inventory.name
                 )) filter (where inventory.id is not null), '[]'
             ) as inventory
         FROM users
@@ -57,7 +57,8 @@ async def get_office_employees(office_id):
         WHERE office_id='{office_id}'
         GROUP BY users.id
     """)
-    return [SOfficeEmployee(**elem) for elem in result]
+    # return [SOfficeEmployee(**elem) for elem in result]
+    return result
 
 
 @router.get('/employees/{employee_id}/inventory')

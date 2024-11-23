@@ -1,7 +1,8 @@
 from uuid import UUID
 
 from asyncpg import connect
-from fastapi import APIRouter, Depends, Response, status
+from fastapi import APIRouter, Depends, Response, status, HTTPException
+from sqlalchemy.exc import IntegrityError
 
 from app.config import settings
 from app.repositories.users import UsersRepository
@@ -40,7 +41,9 @@ async def add_employee(employee: SRegisterUser, access_token: str = Depends(get_
         email=employee.email,
         position=employee.position,
         role_id=dict(role[0])["id"],
-        password=get_password_hash(employee.password)
+        password=get_password_hash(employee.password),
+        office_id=employee.office_id,
+        floor_id=employee.floor_id
     )
     return {'id': new_user_id}
 
@@ -48,16 +51,20 @@ async def add_employee(employee: SRegisterUser, access_token: str = Depends(get_
 @router.put('/employee/{employee_id}', status_code=status.HTTP_204_NO_CONTENT)
 async def edit_user(employee_id: UUID, employee: SRegisterUser, access_token: str = Depends(get_admin_token)):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
-    role = await conn.fetch(f'SELECT * FROM roles WHERE name={employee.role_id}')
-    await check_fio_or_email_exists(employee.fio, employee.email)
-    await UsersRepository.update(
-        id=employee_id,
-        fio=employee.fio,
-        email=employee.email,
-        position=employee.position,
-        role_id=dict(role[0])["id"],
-        password=get_password_hash(employee.password)
-    )
+    role = await conn.fetch(f"SELECT * FROM roles WHERE name='{employee.role}'")
+    try:
+        await UsersRepository.update(
+            id_=employee_id,
+            fio=employee.fio,
+            email=employee.email,
+            position=employee.position,
+            role_id=dict(role[0])["id"],
+            password=get_password_hash(employee.password),
+            office_id=employee.office_id,
+            floor_id=employee.floor_id
+        )
+    except IntegrityError:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT)
 
 
 @router.delete('/employee/{employee_id}', status_code=status.HTTP_204_NO_CONTENT)
