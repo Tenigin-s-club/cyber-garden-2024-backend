@@ -1,49 +1,21 @@
 from pydantic import BaseModel, EmailStr
 from uuid import UUID
 
-class SCreateOffice(BaseModel):
+
+class SOfficeCreate(BaseModel):
     name: str
     image: str
     address: str
     
 
-class SCreateFloor(BaseModel):
+class SFloorCreate(BaseModel):
     office_id: int
     name: str
     
 
-class SGetOffice(SCreateOffice):
+class SOffice(SOfficeCreate):
     id: int
     
     
-class SGetFloor(BaseModel):
+class SFloor(SFloorCreate):
     id: int
-    name: str
-    
-    
-class SEmployeeInventory(BaseModel):
-    id: int
-    name: str
-    
-
-class SGetUser(BaseModel):
-    id: UUID
-    fio: str
-    position: str
-    place: int
-    email: EmailStr
-    # inventory: list[SEmployeeInventory]
-    
-
-class SMap(BaseModel):
-    id: int
-    type: int
-    x: int
-    y: int
-    is_vertical: bool
-    
-    
-class SInventory(BaseModel):
-    id: int
-    name: str
-    fio: str

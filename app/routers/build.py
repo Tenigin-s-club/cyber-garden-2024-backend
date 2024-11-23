@@ -3,7 +3,7 @@ from fastapi import APIRouter, status
 from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
     InventoryEmployeeRepository
-from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SItem, SFurnitureEmployee, SMapPlace, \
+from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SFurnitureEmployee, SMapPlace, \
     SFurnitureID, SInventoryEmployee, SInventoryID
 
 from asyncpg import connect
