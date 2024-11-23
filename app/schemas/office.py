@@ -30,7 +30,7 @@ class SOfficeInventory(BaseModel):
 
 
 class SOfficeEmployee(BaseModel):
-    id: int
+    id: UUID
     fio: str
     position: str
     email: EmailStr
