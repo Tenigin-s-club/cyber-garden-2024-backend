@@ -2,7 +2,8 @@ from datetime import datetime, timedelta, timezone
 from typing import Annotated
 from uuid import UUID
 
-from fastapi import Header, Request
+from fastapi import Header, Request, Depends
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 import jwt
 from passlib.context import CryptContext
 from pydantic import EmailStr
@@ -65,11 +66,11 @@ def check_token(token: str, check_admin: bool = False) -> None:
         raise InvalidTokenException
 
 
-def get_admin_token(access_token: Annotated[str | None, Header()] = None):
-    check_token(access_token, check_admin=True)
-    return access_token
+def get_admin_token(authorization: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())]):
+    check_token(authorization.credentials, check_admin=True)
+    return authorization.credentials
 
 
-def check_endpoint_permissions(request: Request, access_token: Annotated[str | None, Header()] = None):
+def check_endpoint_permissions(request: Request, authorization: Annotated[HTTPAuthorizationCredentials, Depends(HTTPBearer())]):
     if request.method == 'GET': return
-    check_token(access_token, check_admin=True)
+    check_token(authorization.credentials, check_admin=True)
