@@ -18,9 +18,8 @@ router = APIRouter(
 
 
 @router.get("/inventory/{office_id}")
-async def get_inventory(office_id: int):
-    conn = await connect(settings.POSTGRES_CLEAR_URL)
-    result = await InventoryTypesRepository.get_office_inventory(office_id)
+async def get_inventory(office_id: int, is_free: bool = False):
+    result = await InventoryTypesRepository.get_office_inventory(office_id, is_free)
     return result
     
     
