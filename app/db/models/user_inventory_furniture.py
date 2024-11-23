@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from uuid import UUID
 
@@ -11,3 +11,4 @@ class UserInventoryFurniture(Base):
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     furniture_id: Mapped[int | None] = mapped_column(ForeignKey("furniture.id", ondelete="CASCADE"))
     inventory_id: Mapped[int | None] = mapped_column(ForeignKey("inventory.id", ondelete="CASCADE"))
+    inventory: Mapped["InventoryTypes"] = relationship()

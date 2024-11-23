@@ -15,3 +15,6 @@ class User(Base):
     role_id: Mapped[int] = mapped_column(ForeignKey("roles.id", ondelete="CASCADE"))
     role: Mapped["Role"] = relationship()
     password: Mapped[str]
+    office_id: Mapped[int | None] = mapped_column(ForeignKey("offices.id"))
+    floor_id: Mapped[int | None] = mapped_column(ForeignKey("floors.id"))
+    items: Mapped[list["UserInventoryFurniture"]] = relationship(uselist=True)

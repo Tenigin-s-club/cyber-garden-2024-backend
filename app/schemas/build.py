@@ -30,3 +30,7 @@ class SItem(BaseModel):
 class SEmployeeItem(SItem):
     employee_id: int
     
+    
+class SResponse(BaseModel):
+    pass
+    

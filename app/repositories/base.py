@@ -54,7 +54,7 @@ class BaseRepository(AbstractRepository):
             return [cls.model_pydantic_schema(**elem) for elem in mapping_result] if mapping_result else None
 
     @classmethod
-    async def create(cls, **values) -> UUID:
+    async def create(cls, **values) -> Union[UUID, None]:
         async with async_session_maker() as session:
             query = insert(cls.model).values(**values).returning(cls.model.id)
             result = await session.execute(query)
@@ -62,7 +62,7 @@ class BaseRepository(AbstractRepository):
             return result.scalar()
 
     @classmethod
-    async def update(cls, id_, **values) -> UUID:
+    async def update(cls, id_, **values) -> Union[UUID, None]:
         async with async_session_maker() as session:
             query = update(cls.model).filter_by(id=id_).values(**values).returning(cls.model.id)
             result = await session.execute(query)
@@ -75,3 +75,5 @@ class BaseRepository(AbstractRepository):
             query = delete(cls.model).filter_by(**filter_by)
             await session.execute(query)
             await session.commit()
+            
+            
