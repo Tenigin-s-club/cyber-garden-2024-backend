@@ -1,4 +1,5 @@
 from pydantic import BaseModel, model_validator
+from typing import Optional
 
 
 
@@ -25,8 +26,8 @@ class SFurnitureTypeCreate(BaseModel):
     
     
 class SMapPlace(BaseModel):
-    id: int
-    type: int
+    id: int | None = None
+    furniture_id: int
     x: int
     y: int
     is_vertical: bool

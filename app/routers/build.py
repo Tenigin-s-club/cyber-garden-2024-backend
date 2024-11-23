@@ -54,17 +54,17 @@ async def update_floor(
     map: SMap
 ):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
-    await conn.execute(f"DELETE * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
+    await conn.execute(f"DELETE FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     for item in map.items:
         if not item.id:
             await conn.execute(f"""
                 INSERT INTO map (office_id, floor_id, furniture_id, x, y, is_vertical)
-                VALUES ({office_id}, {floor_id}, {item.type}, {item.x}, {item.y}, {item.is_vertical});
+                VALUES ({office_id}, {floor_id}, {item.furniture_id}, {item.x}, {item.y}, {item.is_vertical});
             """)
         else:
             await conn.execute(f"""
                 INSERT INTO map (id, office_id, floor_id, furniture_id, x, y, is_vertical)
-                VALUES ({item.id}, {office_id}, {floor_id}, {item.type}, {item.x}, {item.y}, {item.is_vertical});
+                VALUES ({item.id}, {office_id}, {floor_id}, {item.furniture_id}, {item.x}, {item.y}, {item.is_vertical});
             """)
     result = await conn.fetch(f"SELECT * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     return SMap(items=[SMapPlace(**item) for item in result])
@@ -83,28 +83,6 @@ async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
     await InventoryEmployeeRepository.create(
         user_id=inventory_employee.user_id,
         inventory_id=inventory_employee.inventory_id,
-    )
-
-
-@router.put("/attach/furniture/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_employee_furniture(
-    employee_id: str,
-    furniture: SFurnitureID
-) -> None:
-    await FurnitureEmployeeRepository.update(
-        id_=employee_id,
-        furniture_id=furniture.furniture_id,
-    )
-
-
-@router.put("/attach/inventory/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_employee_inventory(
-    employee_id: str,
-    inventory: SInventoryID
-) -> None:
-    await InventoryEmployeeRepository.update(
-        id_=employee_id,
-        furniture_id=inventory.inventory_id,
     )
 
 

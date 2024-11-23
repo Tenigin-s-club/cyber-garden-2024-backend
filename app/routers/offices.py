@@ -1,12 +1,10 @@
 from fastapi import APIRouter, status, Depends
+from asyncpg import connect
 
 from app.config import settings
 from app.schemas.build import SMap, SMapPlace, SInventoryType
 from app.schemas.office import SOfficeCreate, SFloorCreate, SOfficeInventory, SOfficeEmployee
 from app.repositories.offices import OfficesRepository, FloorsRepository
-
-from asyncpg import connect
-
 from app.utils import check_endpoint_permissions
 
 router = APIRouter(
@@ -61,7 +59,7 @@ async def get_office_employees(office_id):
 
 
 @router.get('/employees/{employee_id}/inventory')
-async def get_employee_inventory(employee_id: int):
+async def get_employee_inventory(employee_id: str):
     conn = await connect(settings.POSTGRES_ASYNCPG_URL)
     result = await conn.fetch(f"""
         SELECT inventory.id, inventory.name FROM user_inventory
