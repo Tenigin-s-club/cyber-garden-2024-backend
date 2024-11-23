@@ -29,7 +29,8 @@ async def get_furniture():
     
 @router.post("/inventory", status_code=status.HTTP_201_CREATED)
 async def add_inventory(inventory: SInventoryTypeCreate):
-    return await InventoryTypesRepository.create(**inventory.model_dump())
+    id = await InventoryTypesRepository.create_inventory(inventory)
+    return SInventoryID(inventory_id=id)
     
     
 @router.post("/furniture", status_code=status.HTTP_201_CREATED)

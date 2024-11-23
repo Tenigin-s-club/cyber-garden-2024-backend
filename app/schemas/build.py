@@ -17,6 +17,7 @@ class SFurnitureType(BaseModel):
 
 class SInventoryTypeCreate(BaseModel):
     name: str
+    office_id: int
 
 
 class SFurnitureTypeCreate(BaseModel):

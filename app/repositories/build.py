@@ -1,16 +1,31 @@
 from sqlalchemy import insert
 
-from app.db.models import InventoryTypes, FurnitureTypes
-from app.db.models.user_furniture import UserFurniture
-from app.db.models.user_inventory import UserInventory
+from app.db.models import InventoryTypes, FurnitureTypes, UserFurniture, UserInventory, WhoreHouse
 from app.db.base import async_session_maker
 from app.repositories.base import BaseRepository
-from app.schemas.build import SInventoryType, SFurnitureType, SFurnitureEmployee, SInventoryEmployee
+from app.schemas.build import SInventoryType, SFurnitureType, SFurnitureEmployee, SInventoryEmployee, SInventoryID, SInventoryTypeCreate
 
 
 class InventoryTypesRepository(BaseRepository):
     model = InventoryTypes
     model_pydantic_schema = SInventoryType
+    
+    @staticmethod
+    async def create_inventory(inventory: SInventoryTypeCreate) -> SInventoryID:
+        async with async_session_maker() as session:
+            insert_query = insert(InventoryTypes).values(
+                name=inventory.name
+            ).returning(InventoryTypes.id)
+            inventory_id = await session.execute(insert_query)
+            inventory_id = inventory_id.scalar()
+            insert_query_whorehouse = insert(WhoreHouse).values(
+                office_id=inventory.office_id,
+                inventory_id=inventory_id
+            )
+            await session.execute(insert_query_whorehouse)
+            await session.commit()
+            return inventory_id
+        
 
 
 class FurnitureTypesRepository(BaseRepository):
