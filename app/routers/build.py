@@ -94,9 +94,8 @@ async def delete_employee_inventory(employee_id: int) -> None:
     await InventoryEmployeeRepository.delete(user_id=employee_id)
     
 
-@router.delete("/attach/inventory/{employee_id}/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/attach/inventory/employee/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_attach_employee_inventory(
-    employee_id: str,
     inventory_id: int
-):
-    await InventoryEmployeeRepository.delete(user_id=employee_id, inventory_id=inventory_id)
+) -> None:
+    await InventoryEmployeeRepository.delete(inventory_id=inventory_id)
