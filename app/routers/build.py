@@ -73,7 +73,7 @@ async def update_floor(
 @router.post("/attach/employee", status_code=status.HTTP_201_CREATED)
 async def attach_employee_furniture(furniture_employee: SFurnitureEmployee):
     await FurnitureEmployeeRepository.create(
-        user_id=furniture_employee.employee_id,
+        user_id=furniture_employee.user_id,
         furniture_id=furniture_employee.furniture_id,
     )
 
