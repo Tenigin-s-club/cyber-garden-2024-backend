@@ -17,4 +17,6 @@ class User(Base):
     password: Mapped[str]
     office_id: Mapped[int | None] = mapped_column(ForeignKey("offices.id"))
     floor_id: Mapped[int | None] = mapped_column(ForeignKey("floors.id"))
-    items: Mapped[list["UserInventoryFurniture"]] = relationship(uselist=True)
+    inventory: Mapped[list["UserInventory"]] = relationship(uselist=True)
+    furniture: Mapped[list["UserFurniture"]] = relationship(uselist=True)
+    

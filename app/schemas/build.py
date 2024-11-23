@@ -17,6 +17,8 @@ class SInventoryTypeCreate(BaseModel):
 
 class SFurnitureTypeCreate(BaseModel):
     name: str
+    size_x: int 
+    size_y: int
     
     
 class SMapPlace(BaseModel):
