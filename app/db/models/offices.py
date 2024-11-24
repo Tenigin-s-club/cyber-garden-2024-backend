@@ -9,5 +9,3 @@ class Office(Base):
     name: Mapped[str] = mapped_column(unique=True)
     address: Mapped[str] = mapped_column(unique=True)
     image: Mapped[str]
-    
-    

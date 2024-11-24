@@ -1,14 +1,19 @@
 import json
 
 from fastapi import APIRouter, status, Depends
+from fastapi.responses import FileResponse
 from asyncpg import connect
+from docx import Document
+from sqlalchemy import select
 
 from app.config import settings
 from app.schemas.build import SMap, SMapPlace, SInventoryType
 from app.schemas.office import SOfficeCreate, SFloorCreate, SOfficeInventory, SOfficeEmployee
 from app.repositories.offices import OfficesRepository, FloorsRepository
+from app.utils import get_admin_token
+from app.db.base import async_session_maker
+from app.db.models import Office
 
-from asyncpg import connect
 
 from app.utils import check_endpoint_permissions
 
@@ -80,10 +85,13 @@ async def get_employee_inventory(employee_id: str) -> list[SInventoryType]:
     return [SInventoryType(**elem) for elem in result]
     
     
-@router.get('/map/{office_id}/{floor_id}')
-async def get_map(office_id: int, floor_id: int) -> SMap:
+@router.get('/map/{office_id}')
+async def get_map(office_id: int, floor_id: int | None = None) -> SMap:
     conn = await connect(settings.POSTGRES_CLEAR_URL)
-    result = await conn.fetch(f"SELECT * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
+    query = f"SELECT * FROM map WHERE office_id='{office_id}'"
+    if floor_id:
+        query += f"AND floor_id='{floor_id}'"
+    result = await conn.fetch(query)
     return SMap(items=[SMapPlace(**item) for item in result])
     
 
@@ -121,3 +129,53 @@ async def delete_office(office_id: int) -> None:
 @router.delete("/floor/{floor_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_floor(floor_id: int) -> None:
     await FloorsRepository.delete(floor_id)
+    
+    
+@router.get('/stats', status_code=status.HTTP_200_OK)
+async def get_statistics(access_token: str = Depends(get_admin_token)):
+    doc = Document()
+    doc.add_heading('Статистика оборудования', 0)
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
+    await conn.set_type_codec(
+        'json',
+        encoder=json.dumps,
+        decoder=json.loads,
+        schema='pg_catalog'
+    )
+    result = await conn.fetch("""
+SELECT 
+    offices.name AS office_name, 
+    offices.address,
+    COALESCE(
+        JSON_AGG(
+                floors.id
+        ), '[]'
+    ) AS floors,
+    COALESCE(
+        JSON_AGG(
+            JSON_BUILD_OBJECT(
+                'id', users.id, 
+                'user_inventory', (
+                    SELECT COALESCE(
+                        JSON_AGG(
+                            JSON_BUILD_OBJECT(
+                                'id', user_inventory.id
+                            )
+                        ), '[]'
+                    )
+                    FROM user_inventory
+                )
+            )
+        ), '[]'
+    ) AS users
+FROM offices
+LEFT JOIN floors ON floors.office_id = offices.id
+LEFT JOIN users ON users.office_id = offices.id
+GROUP BY offices.id;
+""")
+    print(result)
+    doc.save('stats.docx')
+    return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
+
+    
+    
