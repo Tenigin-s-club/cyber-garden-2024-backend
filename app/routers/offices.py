@@ -225,7 +225,7 @@ async def get_statistics(access_token: str = Depends(get_admin_token)):
         В среднем этажей в офисе: {offices["avg_floors"]}
         Максимум этажей в офисе: {offices["max_floors"]}
         Минимум этажей в офисе: {offices["min_floors"]}
-    ''')
+    '''.replace('\n', '', 1))
 
     doc.save('stats.docx')
     return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
