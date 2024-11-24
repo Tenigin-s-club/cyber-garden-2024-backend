@@ -2,7 +2,7 @@ from pydantic import BaseModel, EmailStr, model_validator
 from uuid import UUID
 import json
 
-from app.schemas.build import SInventoryType
+from app.schemas.build import SInventoryType, SFurnitureID
 
 
 class SOfficeCreate(BaseModel):
@@ -36,3 +36,4 @@ class SOfficeEmployee(BaseModel):
     position: str
     email: EmailStr
     inventory: list[SInventoryType]
+    furniture: list[SFurnitureID]

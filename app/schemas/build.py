@@ -45,7 +45,7 @@ class SFurnitureEmployee(SFurnitureIDS):
 
 
 class SFurnitureID(BaseModel):
-    furniture_id: int
+    id: int
     
 
 class SInventoryIDS(BaseModel):

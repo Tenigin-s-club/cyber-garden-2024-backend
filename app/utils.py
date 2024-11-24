@@ -62,7 +62,7 @@ def check_token(token: str, check_admin: bool = False) -> None:
         role_id = jwt.decode(token, settings.SECRET_KEY, settings.ENCODE_ALGORITHM).get('role_id')
         if check_admin and role_id != 0:
             raise DontHavePermissionException
-    except jwt.exceptions.DecodeError:
+    except(jwt.exceptions.ExpiredSignatureError, jwt.exceptions.InvalidSignatureError, jwt.exceptions.InvalidTokenError):
         raise InvalidTokenException
 
 

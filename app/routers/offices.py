@@ -64,10 +64,16 @@ async def get_office_employees(office_id) -> list[SOfficeEmployee]:
             coalesce(json_agg(json_build_object(
                 'id', inventory.id, 'name', inventory.name
                 )) filter (where inventory.id is not null), '[]'
-            ) as inventory
+            ) as inventory,
+            coalesce(json_agg(json_build_object(
+                'id', furniture.id
+            )) filter (where furniture.id is not null), '[]'
+            ) as furniture
         FROM users
         LEFT JOIN user_inventory ON user_inventory.user_id = users.id
+        LEFT JOIN user_furniture ON user_furniture.user_id = users.id
         LEFT JOIN inventory ON user_inventory.inventory_id = inventory.id
+        LEFT JOIN furniture ON user_furniture.furniture_id = furniture.id
         WHERE office_id='{office_id}'
         GROUP BY users.id
     """)
@@ -174,8 +180,20 @@ LEFT JOIN users ON users.office_id = offices.id
 GROUP BY offices.id;
 """)
     print(result)
+    result = [dict(office) for office in result]
+    for office in result:
+        print(office)
+        items_quantity = 0
+        for user in office["users"]:
+            items_quantity += len(user["user_inventory"])
+        doc.add_heading(f"Офис №{result.index(office)+1}:")
+        doc.add_paragraph(f"Название: {office["office_name"]}\nАдресс: {office["address"]}")
+        doc.add_paragraph(f"""Количество этажей: {len(office["floors"])}
+Количество сотрудников: {len(office["users"])}
+Количество инвенторя сотрудников: {items_quantity}
+""")
     doc.save('stats.docx')
     return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
 
-    
+
     
