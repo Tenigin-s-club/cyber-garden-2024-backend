@@ -43,8 +43,7 @@ class InventoryTypesRepository(BaseRepository):
             inventory = inventory.unique().mappings().all()
             return [SInventoryEmployeeOffice(**row) for row in inventory]
             
-            
-
+        
 class FurnitureTypesRepository(BaseRepository):
     model = FurnitureTypes
     model_pydantic_schema = SFurnitureType
@@ -68,13 +67,14 @@ class FurnitureTypesRepository(BaseRepository):
     @staticmethod
     async def get_office_furniture(office_id: int):
         async with async_session_maker() as session:
-            query = (select(FurnitureTypes.name, InventoryTypes.id, User.fio, FurnitureTypes.size_x, FurnitureTypes.size_y)
+            query = (select(FurnitureTypes.name, FurnitureTypes.id, User.fio, FurnitureTypes.size_x, FurnitureTypes.size_y)
                      .where(or_(User.office_id == office_id, WhoreHouse.office_id == office_id))
                      .join(UserFurniture, UserFurniture.furniture_id == FurnitureTypes.id, isouter=True)
                      .join(User, User.id == UserFurniture.user_id, isouter=True))
             furniture = await session.execute(query)
             furniture = furniture.unique().mappings().all()
             return [SFurnitureEmployeeOffice(**row) for row in furniture]
+
 
 class InventoryEmployeeRepository(BaseRepository):
     model = UserInventory
