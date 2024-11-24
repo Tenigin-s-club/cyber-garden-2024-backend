@@ -46,4 +46,4 @@ class WrongFileExtensionException(BaseException):
 
 class IncorrectColumnsSetException(BaseException):
     status_code = status.HTTP_400_BAD_REQUEST
-    detail = 'incorrect columns set in excel file, need: fio, email, password, position and role'
+    detail = 'incorrect columns set in excel file, need: fio, email, password, position, role and office_id'

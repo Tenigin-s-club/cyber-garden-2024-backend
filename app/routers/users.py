@@ -97,7 +97,7 @@ async def load_employees(file: UploadFile, access_token: str = Depends(get_admin
 
     data = pd.DataFrame(
         excel_data,
-        columns=['fio', 'email', 'password', 'position', 'role']
+        columns=['fio', 'email', 'password', 'position', 'role', 'office_id']
     )
     data = data[~(data["fio"].isin(fios)) & ~(data["email"].isin(emails))]
     data['role_id'] = data['role'].map(roles)
