@@ -4,7 +4,7 @@ from app.db.models import InventoryTypes, FurnitureTypes, UserFurniture, UserInv
 from app.db.base import async_session_maker
 from app.repositories.base import BaseRepository
 from app.schemas.build import SInventoryType, SFurnitureType, \
-SFurnitureEmployee, SInventoryEmployee, SInventoryID, SInventoryTypeCreate, SInventoryEmployeeOffice
+SFurnitureEmployee, SInventoryEmployee, SInventoryID, SInventoryTypeCreate, SInventoryEmployeeOffice, SFurnitureTypeCreate
 
 
 class InventoryTypesRepository(BaseRepository):
@@ -48,6 +48,22 @@ class InventoryTypesRepository(BaseRepository):
 class FurnitureTypesRepository(BaseRepository):
     model = FurnitureTypes
     model_pydantic_schema = SFurnitureType
+    
+    @staticmethod
+    async def create_furniture(furniture: SFurnitureTypeCreate) -> SInventoryID:
+        async with async_session_maker() as session:
+            insert_query = insert(FurnitureTypes).values(
+                **furniture.model_dump(exclude="office_id")
+            ).returning(FurnitureTypes.id)
+            furniture_id = await session.execute(insert_query)
+            furniture_id = furniture_id.scalar()
+            insert_query_whorehouse = insert(WhoreHouse).values(
+                office_id=furniture.office_id,
+                furniture_id=furniture_id
+            )
+            await session.execute(insert_query_whorehouse)
+            await session.commit()
+            return furniture_id
 
 
 class InventoryEmployeeRepository(BaseRepository):
@@ -58,17 +74,13 @@ class InventoryEmployeeRepository(BaseRepository):
     @staticmethod
     async def create_attaches_inventory(inventory_employee: SInventoryEmployee) -> None:
         async with async_session_maker() as session:
-            ids = []
             for inventory_id in inventory_employee.inventory_ids:
                 query_add = (insert(UserInventory).values(
                     user_id=inventory_employee.user_id,
                     inventory_id=inventory_id
-                ).returning(UserInventory.id))
-                id = await session.execute(query_add)
-                ids.append(id.scalar())
-                
+                ))
+                await session.execute(query_add)
             await session.commit()
-            return ids
 
 
 class FurnitureEmployeeRepository(BaseRepository):
@@ -79,14 +91,11 @@ class FurnitureEmployeeRepository(BaseRepository):
     @staticmethod
     async def create_attaches_furniture(furniture_employee: SFurnitureEmployee) -> None:
         async with async_session_maker() as session:
-            ids = []
             for furniture_id in furniture_employee.furniture_ids:
                 query_add = (insert(UserFurniture).values(
                     user_id=furniture_employee.user_id,
                     furniture_id=furniture_id
-                ).returning(UserFurniture.id))
-                id = await session.execute(query_add)
-                ids.append(id.scalar())
-                
+                ))
+                await session.execute(query_add)      
             await session.commit()
-            return ids
+

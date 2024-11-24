@@ -11,4 +11,4 @@ class UserFurniture(Base):
     # unique constraint on user_id
     id: Mapped[int] = mapped_column(primary_key=True)
     user_id: Mapped[UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
-    furniture_id: Mapped[int] = mapped_column(ForeignKey("furniture.id", ondelete="CASCADE"))
+    furniture_id: Mapped[int] = mapped_column(ForeignKey("furniture.id", ondelete="CASCADE"), unique=True)

@@ -8,6 +8,6 @@ class FurnitureTypes(Base):
     __tablename__ = "furniture"
     
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(unique=True)
+    name: Mapped[str] 
     size_x: Mapped[int]
     size_y: Mapped[int]

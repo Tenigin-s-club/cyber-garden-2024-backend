@@ -9,6 +9,6 @@ class WhoreHouse(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     office_id: Mapped[int] = mapped_column(ForeignKey("offices.id", ondelete="CASCADE"))
-    inventory_id: Mapped[int] = mapped_column(ForeignKey("inventory.id", ondelete="CASCADE"), unique=True)
-    
+    inventory_id: Mapped[int | None] = mapped_column(ForeignKey("inventory.id", ondelete="CASCADE"), unique=True)
+    furniture_id: Mapped[int | None] = mapped_column(ForeignKey("furniture.id", ondelete="CASCADE"), unique=True)
     
