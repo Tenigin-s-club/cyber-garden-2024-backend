@@ -73,6 +73,11 @@ class SInventoryEmployeeOffice(SInventoryBase):
     fio: str | None = None
     
     
+class SFurnitureEmployeeOffice(SInventoryEmployeeOffice):
+    size_x: int
+    size_y: int
+    
+    
 
     
     
