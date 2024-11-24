@@ -81,7 +81,7 @@ async def get_employee_inventory(employee_id: str) -> list[SInventoryType]:
     
     
 @router.get('/map/{office_id}/{floor_id}')
-async def get_map(office_id: int, floor_id: int) -> Map:
+async def get_map(office_id: int, floor_id: int) -> SMap:
     conn = await connect(settings.POSTGRES_CLEAR_URL)
     result = await conn.fetch(f"SELECT * FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     return SMap(items=[SMapPlace(**item) for item in result])
