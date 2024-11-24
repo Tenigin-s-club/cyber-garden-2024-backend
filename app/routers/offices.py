@@ -137,63 +137,63 @@ async def delete_floor(floor_id: int) -> None:
     await FloorsRepository.delete(floor_id)
     
     
-@router.get('/stats', status_code=status.HTTP_200_OK)
-async def get_statistics(access_token: str = Depends(get_admin_token)):
-    doc = Document()
-    doc.add_heading('Статистика оборудования', 0)
-    conn = await connect(settings.POSTGRES_CLEAR_URL)
-    await conn.set_type_codec(
-        'json',
-        encoder=json.dumps,
-        decoder=json.loads,
-        schema='pg_catalog'
-    )
-    result = await conn.fetch("""
-SELECT 
-    offices.name AS office_name, 
-    offices.address,
-    COALESCE(
-        JSON_AGG(
-                floors.id
-        ), '[]'
-    ) AS floors,
-    COALESCE(
-        JSON_AGG(
-            JSON_BUILD_OBJECT(
-                'id', users.id, 
-                'user_inventory', (
-                    SELECT COALESCE(
-                        JSON_AGG(
-                            JSON_BUILD_OBJECT(
-                                'id', user_inventory.id
-                            )
-                        ), '[]'
-                    )
-                    FROM user_inventory
-                )
-            )
-        ), '[]'
-    ) AS users
-FROM offices
-LEFT JOIN floors ON floors.office_id = offices.id
-LEFT JOIN users ON users.office_id = offices.id
-GROUP BY offices.id;
-""")
-    print(result)
-    result = [dict(office) for office in result]
-    for office in result:
-        print(office)
-        items_quantity = 0
-        for user in office["users"]:
-            items_quantity += len(user["user_inventory"])
-        doc.add_heading(f"Офис №{result.index(office)+1}:")
-        doc.add_paragraph(f"Название: {office["office_name"]}\nАдресс: {office["address"]}")
-        doc.add_paragraph(f"""Количество этажей: {len(office["floors"])}
-Количество сотрудников: {len(office["users"])}
-Количество инвенторя сотрудников: {items_quantity}
-""")
-    doc.save('stats.docx')
-    return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
+# @router.get('/stats', status_code=status.HTTP_200_OK)
+# async def get_statistics(access_token: str = Depends(get_admin_token)):
+#     doc = Document()
+#     doc.add_heading('Статистика оборудования', 0)
+#     conn = await connect(settings.POSTGRES_CLEAR_URL)
+#     await conn.set_type_codec(
+#         'json',
+#         encoder=json.dumps,
+#         decoder=json.loads,
+#         schema='pg_catalog'
+#     )
+#     result = await conn.fetch("""
+# SELECT 
+#     offices.name AS office_name, 
+#     offices.address,
+#     COALESCE(
+#         JSON_AGG(
+#                 floors.id
+#         ), '[]'
+#     ) AS floors,
+#     COALESCE(
+#         JSON_AGG(
+#             JSON_BUILD_OBJECT(
+#                 'id', users.id, 
+#                 'user_inventory', (
+#                     SELECT COALESCE(
+#                         JSON_AGG(
+#                             JSON_BUILD_OBJECT(
+#                                 'id', user_inventory.id
+#                             )
+#                         ), '[]'
+#                     )
+#                     FROM user_inventory
+#                 )
+#             )
+#         ), '[]'
+#     ) AS users
+# FROM offices
+# LEFT JOIN floors ON floors.office_id = offices.id
+# LEFT JOIN users ON users.office_id = offices.id
+# GROUP BY offices.id;
+# """)
+#     print(result)
+#     result = [dict(office) for office in result]
+#     for office in result:
+#         print(office)
+#         items_quantity = 0
+#         for user in office["users"]:
+#             items_quantity += len(user["user_inventory"])
+#         doc.add_heading(f"Офис №{result.index(office)+1}:")
+#         doc.add_paragraph(f"Название: {office["office_name"]}\nАдресс: {office["address"]}")
+#         doc.add_paragraph(f"""Количество этажей: {len(office["floors"])}
+# Количество сотрудников: {len(office["users"])}
+# Количество инвенторя сотрудников: {items_quantity}
+# """)
+#     doc.save('stats.docx')
+#     return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
 
 
     
