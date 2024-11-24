@@ -62,11 +62,11 @@ async def get_office_employees(office_id) -> list[SOfficeEmployee]:
             users.fio,
             users.position,
             users.email,
-            coalesce(json_agg(json_build_object(
+            coalesce(json_agg(distinct jsonb_build_object(
                 'id', inventory.id, 'name', inventory.name
                 )) filter (where inventory.id is not null), '[]'
             ) as inventory,
-            coalesce(json_agg(json_build_object(
+            coalesce(json_agg(distinct jsonb_build_object(
                 'id', furniture.id
             )) filter (where furniture.id is not null), '[]'
             ) as furniture
