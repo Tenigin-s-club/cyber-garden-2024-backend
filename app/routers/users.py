@@ -1,3 +1,4 @@
+from io import BytesIO
 from os.path import splitext
 from uuid import UUID
 
@@ -86,7 +87,8 @@ async def load_employees(file: UploadFile, access_token: str = Depends(get_admin
     _, file_extension = splitext(file.filename)
     if file_extension != '.xlsx':
         raise WrongFileExtensionException
-    excel_data = pd.read_excel(file.filename)
+    file_content = await file.read()
+    excel_data = pd.read_excel(BytesIO(file_content))
 
     conn = await connect(settings.POSTGRES_CLEAR_URL)
     roles = {name: id for id, name in await conn.fetch('SELECT * FROM roles')}
