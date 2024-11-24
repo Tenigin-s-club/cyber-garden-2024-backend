@@ -64,7 +64,17 @@ class FurnitureTypesRepository(BaseRepository):
             await session.execute(insert_query_whorehouse)
             await session.commit()
             return furniture_id
-
+        
+    @staticmethod
+    async def get_office_furniture(office_id: int):
+        async with async_session_maker() as session:
+            query = (select(FurnitureTypes.name, InventoryTypes.id, User.fio)
+                     .where(or_(User.office_id == office_id, WhoreHouse.office_id == office_id))
+                     .join(UserFurniture, UserFurniture.furniture_id == FurnitureTypes.id, isouter=True)
+                     .join(User, User.id == UserFurniture.user_id, isouter=True))
+            furniture = await session.execute(query)
+            furniture = furniture.unique().mappings().all()
+            return [SInventoryEmployeeOffice(**row) for row in furniture]
 
 class InventoryEmployeeRepository(BaseRepository):
     model = UserInventory

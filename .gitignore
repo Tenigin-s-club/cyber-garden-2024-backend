@@ -14,10 +14,6 @@ __pycache__
 # macos folder settings
 .DS_Store
 
-<<<<<<< HEAD
-*.docx
-=======
 # microsoft word and excel files
 *.docx
 *.xlsx
->>>>>>> 5bbb68822ca7743dadc21fb95d887f5a912bd503

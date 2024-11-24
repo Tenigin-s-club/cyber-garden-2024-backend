@@ -26,7 +26,7 @@ async def get_inventory(office_id: int, status: Literal["free", "not_free"] | No
     
 @router.get("/furniture/{office_id}")
 async def get_furniture(office_id: int):
-    return await FurnitureTypesRepository.find_all(office_id)
+    return await FurnitureTypesRepository.get_office_furniture(office_id)
     
     
 @router.post("/inventory", status_code=status.HTTP_201_CREATED)
@@ -82,7 +82,7 @@ async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> N
     
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
 async def attach_employee_inventory(inventory_employee: SInventoryEmployee) -> None:
-    InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
+    await InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
 
 
 @router.put("/inventory/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)

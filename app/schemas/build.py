@@ -73,3 +73,6 @@ class SInventoryEmployeeOffice(SInventoryBase):
     fio: str | None = None
     
     
+
+    
+    
