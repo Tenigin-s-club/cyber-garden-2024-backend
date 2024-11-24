@@ -1,10 +1,11 @@
 from fastapi import APIRouter, status, Depends
+from typing import Literal
 
 from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
     InventoryEmployeeRepository
 from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SFurnitureEmployee, SMapPlace, \
-    SFurnitureID, SInventoryEmployee, SInventoryID, SFurnitureIDS, SInventoryIDS
+    SFurnitureID, SInventoryEmployee, SInventoryID, SFurnitureIDS, SInventoryIDS, SInventoryBase
 
 from asyncpg import connect
 
@@ -18,9 +19,8 @@ router = APIRouter(
 
 
 @router.get("/inventory/{office_id}")
-async def get_inventory(office_id: int):
-    conn = await connect(settings.POSTGRES_CLEAR_URL)
-    result = await InventoryTypesRepository.get_office_inventory(office_id)
+async def get_inventory(office_id: int, status: Literal["free", "not_free"] | None = None):
+    result = await InventoryTypesRepository.get_office_inventory(office_id, status)
     return result
     
     
@@ -30,7 +30,7 @@ async def get_furniture():
     
     
 @router.post("/inventory", status_code=status.HTTP_201_CREATED)
-async def add_inventory(inventory: SInventoryTypeCreate):
+async def add_inventory(inventory: SInventoryTypeCreate) -> SInventoryID:
     id = await InventoryTypesRepository.create_inventory(inventory)
     return SInventoryID(inventory_id=id)
     
@@ -55,7 +55,7 @@ async def update_floor(
     office_id: int,
     floor_id: int,
     map: SMap
-):
+) -> SMap:
     conn = await connect(settings.POSTGRES_CLEAR_URL)
     await conn.execute(f"DELETE FROM map WHERE office_id='{office_id}' AND floor_id='{floor_id}'")
     for item in map.items:
@@ -78,10 +78,19 @@ async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> S
     ids = await FurnitureEmployeeRepository.create_attaches_furniture(furniture_employee)
     return SFurnitureIDS(furniture_ids=ids)
     
+    
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
-async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
+async def attach_employee_inventory(inventory_employee: SInventoryEmployee) -> SInventoryIDS:
     ids = await InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
     return SInventoryIDS(inventory_ids=ids)
+
+
+@router.put("/inventory/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_inventory(
+    inventory_id: int,
+    inventory: SInventoryBase
+) -> None:
+    await InventoryTypesRepository.update(inventory_id, **inventory.model_dump())
 
 
 @router.delete("/attach/employee/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -92,3 +101,10 @@ async def delete_employee_furniture(employee_id: int) -> None:
 @router.delete("/attach/inventory/{employee_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_employee_inventory(employee_id: int) -> None:
     await InventoryEmployeeRepository.delete(user_id=employee_id)
+    
+
+@router.delete("/attach/inventory/employee/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_attach_employee_inventory(
+    inventory_id: int
+) -> None:
+    await InventoryEmployeeRepository.delete(inventory_id=inventory_id)

@@ -7,23 +7,21 @@ class SInventoryType(BaseModel):
     id: int
     name: str
     
-
-class SFurnitureType(BaseModel):
-    id: int
+    
+class SFurnitureTypeCreate(BaseModel):
     name: str
-    size_x: int
+    size_x: int 
     size_y: int
+
+
+class SFurnitureType(SFurnitureTypeCreate):
+    id: int
 
 
 class SInventoryTypeCreate(BaseModel):
     name: str
     office_id: int
 
-
-class SFurnitureTypeCreate(BaseModel):
-    name: str
-    size_x: int 
-    size_y: int
     
     
 class SMapPlace(BaseModel):
@@ -47,7 +45,7 @@ class SFurnitureEmployee(SFurnitureIDS):
 
 
 class SFurnitureID(BaseModel):
-    furniture_id: int
+    id: int
     
 
 class SInventoryIDS(BaseModel):
@@ -62,7 +60,12 @@ class SInventoryID(BaseModel):
     inventory_id: int
     
     
-class SInventoryEmployeeOffice(BaseModel):
+class SInventoryBase(BaseModel):
+    name: str
+    
+    
+class SInventoryEmployeeOffice(SInventoryBase):
     id: int
     fio: str | None = None
-    name: str
+    
+    

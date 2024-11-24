@@ -8,5 +8,5 @@ class Floor(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(unique=True)
-    office_id: Mapped[int] = mapped_column(ForeignKey("offices.id", onupdate="CASCADE"))
+    office_id: Mapped[int] = mapped_column(ForeignKey("offices.id", ondelete="CASCADE"))
     

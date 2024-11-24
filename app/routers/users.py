@@ -27,7 +27,9 @@ router = APIRouter(
 @router.post('/login', status_code=status.HTTP_200_OK)
 async def login_user(response: Response, user: SLoginUser):
     user = await authenticate_user(user.email, user.password)
-    return {'token': create_token(user.id, user.role_id)}
+    conn = await connect(settings.POSTGRES_CLEAR_URL)
+    role = await conn.fetch(f"SELECT name FROM roles WHERE id='{user.role_id}'")
+    return {'token': create_token(user.id, user.role_id), "role": role[0]["name"]}
 
 
 @router.get('/roles', status_code=status.HTTP_200_OK)
@@ -103,3 +105,4 @@ async def load_employees(file: UploadFile, access_token: str = Depends(get_admin
         data.to_sql('users', sync_engine, if_exists='append', index=False)
     except sqlalchemy.exc.IntegrityError as e:
         raise IncorrectColumnsSetException
+
