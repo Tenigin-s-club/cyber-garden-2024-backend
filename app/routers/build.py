@@ -5,7 +5,7 @@ from app.config import settings
 from app.repositories.build import InventoryTypesRepository, FurnitureTypesRepository, FurnitureEmployeeRepository, \
     InventoryEmployeeRepository
 from app.schemas.build import SInventoryTypeCreate, SFurnitureTypeCreate, SMap, SFurnitureEmployee, SMapPlace, \
-    SFurnitureID, SInventoryEmployee, SInventoryID, SFurnitureIDS, SInventoryIDS, SInventoryBase
+    SFurnitureID, SInventoryEmployee, SInventoryID, SFurnitureIDS, SInventoryIDS, SInventoryBase, SFurnitureIDFurniture
 
 from asyncpg import connect
 
@@ -24,9 +24,9 @@ async def get_inventory(office_id: int, status: Literal["free", "not_free"] | No
     return result
     
     
-@router.get("/furniture")
-async def get_furniture():
-    return await FurnitureTypesRepository.find_all()
+@router.get("/furniture/{office_id}")
+async def get_furniture(office_id: int):
+    return await FurnitureTypesRepository.find_all(office_id)
     
     
 @router.post("/inventory", status_code=status.HTTP_201_CREATED)
@@ -37,7 +37,8 @@ async def add_inventory(inventory: SInventoryTypeCreate) -> SInventoryID:
     
 @router.post("/furniture", status_code=status.HTTP_201_CREATED)
 async def add_furniture(furniture: SFurnitureTypeCreate):
-    return await FurnitureTypesRepository.create(**furniture.model_dump())
+    id = await FurnitureTypesRepository.create_furniture(furniture)
+    return SFurnitureIDFurniture(furniture_id=id)
     
 
 @router.delete("/inventory/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -74,15 +75,14 @@ async def update_floor(
 
 
 @router.post("/attach/furniture", status_code=status.HTTP_201_CREATED)
-async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> SFurnitureIDS:
-    ids = await FurnitureEmployeeRepository.create_attaches_furniture(furniture_employee)
-    return SFurnitureIDS(furniture_ids=ids)
+async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> None:
+    await FurnitureEmployeeRepository.create_attaches_furniture(furniture_employee)
+    
     
     
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
-async def attach_employee_inventory(inventory_employee: SInventoryEmployee) -> SInventoryIDS:
-    ids = await InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
-    return SInventoryIDS(inventory_ids=ids)
+async def attach_employee_inventory(inventory_employee: SInventoryEmployee) -> None:
+    InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)
 
 
 @router.put("/inventory/{inventory_id}", status_code=status.HTTP_204_NO_CONTENT)

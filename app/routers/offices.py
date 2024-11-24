@@ -229,3 +229,6 @@ async def get_statistics(access_token: str = Depends(get_admin_token)):
 
     doc.save('stats.docx')
     return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
+
+
+    

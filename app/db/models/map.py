@@ -13,6 +13,4 @@ class Map(Base):
     x: Mapped[int]
     y: Mapped[int]
     is_vertical: Mapped[bool]
-    x: Mapped[int]
-    y: Mapped[int]
     
