@@ -181,7 +181,7 @@ async def get_statistics(access_token: str = Depends(get_admin_token)):
             count(*) as offices_count,
             sum(users_count) as users_count,
             sum(floors_count) as floors_count,
-            sum(users_count) / sum(floors_count) as users_per_floor,
+            case when sum(floors_count) = 0 then 0 else (sum(users_count) / sum(floors_count)) end as users_per_floor,
             
             round(avg(users_count), 2) as avg_users,
             min(users_count) as min_users,
@@ -225,7 +225,7 @@ async def get_statistics(access_token: str = Depends(get_admin_token)):
         В среднем этажей в офисе: {offices["avg_floors"]}
         Максимум этажей в офисе: {offices["max_floors"]}
         Минимум этажей в офисе: {offices["min_floors"]}
-    ''')
+    '''.replace('\n', '', 1))
 
     doc.save('stats.docx')
     return FileResponse(path='stats.docx', filename='stats.docx', media_type='multipart/form-data')
