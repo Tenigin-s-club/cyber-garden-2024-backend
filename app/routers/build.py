@@ -78,6 +78,7 @@ async def attach_employee_furniture(furniture_employee: SFurnitureEmployee) -> S
     ids = await FurnitureEmployeeRepository.create_attaches_furniture(furniture_employee)
     return SFurnitureIDS(furniture_ids=ids)
     
+    
 @router.post("/attach/inventory", status_code=status.HTTP_201_CREATED)
 async def attach_employee_inventory(inventory_employee: SInventoryEmployee):
     ids = await InventoryEmployeeRepository.create_attaches_inventory(inventory_employee)

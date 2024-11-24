@@ -103,3 +103,4 @@ async def load_employees(file: UploadFile, access_token: str = Depends(get_admin
         data.to_sql('users', sync_engine, if_exists='append', index=False)
     except sqlalchemy.exc.IntegrityError as e:
         raise IncorrectColumnsSetException
+
